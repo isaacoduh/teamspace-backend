@@ -17,7 +17,11 @@ export interface UserDocument extends Document {
 
 const userSchema = new Schema<UserDocument>(
   {
-    name: { type: String, required: false, trim: true },
+    name: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -26,7 +30,10 @@ const userSchema = new Schema<UserDocument>(
       lowercase: true,
     },
     password: { type: String, select: true },
-    profilePicture: { type: String, default: null },
+    profilePicture: {
+      type: String,
+      default: null,
+    },
     currentWorkspace: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Workspace",
@@ -34,13 +41,15 @@ const userSchema = new Schema<UserDocument>(
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date, default: null },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     if (this.password) {
-      this.password = (await hashValue(this.password)) as unknown as string;
+      this.password = await hashValue(this.password);
     }
   }
   next();
